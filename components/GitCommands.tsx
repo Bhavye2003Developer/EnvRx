@@ -6,10 +6,12 @@ function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
 
   function copy() {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    })
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1500)
+      })
+      .catch(() => {})
   }
 
   return (
@@ -61,6 +63,8 @@ export default function GitCommands({ filename = '.env' }: { filename?: string }
     <section className="mt-8 rounded-xl border border-zinc-800 bg-zinc-950">
       <button
         onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        aria-controls="git-commands-body"
         className="flex w-full items-center justify-between px-5 py-4 text-left"
       >
         <h2 className="text-base font-semibold text-zinc-100">
@@ -70,7 +74,7 @@ export default function GitCommands({ filename = '.env' }: { filename?: string }
       </button>
 
       {open && (
-        <div className="border-t border-zinc-800 px-5 pb-5 space-y-6">
+        <div id="git-commands-body" className="border-t border-zinc-800 px-5 pb-5 space-y-6">
           {/* Step 1 */}
           <div className="mt-5 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-3">
             <p className="text-sm font-semibold text-yellow-400">⚠ Step 1 — Rotate keys first</p>
