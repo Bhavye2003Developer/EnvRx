@@ -8,13 +8,17 @@ interface PasteProps {
 
 export default function Paste({ value, onChange, onExample }: PasteProps) {
   const lineCount = value ? value.split('\n').length : 0
-  const keyCount = value ? value.split('\n').filter(l => l.trim() && !l.trim().startsWith('#') && l.includes('=')).length : 0
+  const keyCount = value
+    ? value.split('\n').filter(l => l.trim() && !l.trim().startsWith('#') && l.includes('=')).length
+    : 0
 
   return (
     <div className="w-full">
-      <div className="mb-2.5 flex items-center justify-between">
+      <div className="mb-2.5 flex h-8 items-center justify-between">
         <label htmlFor="env-paste" className="text-sm font-medium text-zinc-300">
-          Paste your <code className="rounded-md bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-200">.env</code> contents
+          Paste your{' '}
+          <code className="rounded-md bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-200">.env</code>{' '}
+          contents
         </label>
         <div className="flex items-center gap-3">
           {value ? (
@@ -49,7 +53,7 @@ export default function Paste({ value, onChange, onExample }: PasteProps) {
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={`OPENAI_API_KEY=sk-...\nSTRIPE_SECRET_KEY=sk_live_...\nDATABASE_URL=postgres://...`}
-          rows={12}
+          rows={14}
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"
