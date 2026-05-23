@@ -151,7 +151,3 @@ EnvRx is deliberately zero-trust:
 - The `.env` content you paste never leaves your browser tab
 
 If you want to verify this, the source is fully open. Check `src/` - there are no API calls, no `fetch()` to any external service, no `localStorage` writes beyond dark mode preference.
-
----
-
-*Built by [@Bhavye2003Developer](https://github.com/Bhavye2003Developer)*
