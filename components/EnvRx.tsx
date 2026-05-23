@@ -5,6 +5,7 @@ import Paste from './Paste'
 import ResultCard from './ResultCard'
 import GitCommands from './GitCommands'
 import AddService from './AddService'
+import ServiceFilter from './ServiceFilter'
 import type { CommunityService } from './AddService'
 import { parseEnv } from '@/lib/parser'
 import { matchServices } from '@/lib/matcher'
@@ -40,6 +41,7 @@ function communityToServiceDef(s: CommunityService): ServiceDef {
 export default function EnvRx() {
   const [raw, setRaw] = useState('')
   const [communityServices, setCommunityServices] = useState<CommunityService[]>([])
+  const [selectedServices, setSelectedServices] = useState<Set<string> | null>(null) // null = all
   const resultsRef = useRef<HTMLDivElement>(null)
 
   const { matches, filename } = useMemo(() => {
@@ -51,10 +53,15 @@ export default function EnvRx() {
     return { matches, filename }
   }, [raw, communityServices])
 
+  const visibleMatches = useMemo(() => {
+    if (selectedServices === null) return matches
+    return matches.filter(m => selectedServices.has(m.service.name))
+  }, [matches, selectedServices])
+
   const hasContent = raw.trim().length > 0
-  const highCount = matches.filter(m => m.service.risk === 'high').length
-  const medCount  = matches.filter(m => m.service.risk === 'medium').length
-  const lowCount  = matches.filter(m => m.service.risk === 'low').length
+  const highCount = visibleMatches.filter(m => m.service.risk === 'high').length
+  const medCount  = visibleMatches.filter(m => m.service.risk === 'medium').length
+  const lowCount  = visibleMatches.filter(m => m.service.risk === 'low').length
 
   function handleExample() {
     setRaw(EXAMPLE_ENV)
@@ -91,7 +98,7 @@ export default function EnvRx() {
             </div>
 
             {/* Risk summary pills */}
-            {matches.length > 0 && (
+            {visibleMatches.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {highCount > 0 && (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-2.5 py-1 text-[11px] font-semibold text-red-400 ring-1 ring-red-500/20 sm:px-3 sm:text-xs">
@@ -119,39 +126,111 @@ export default function EnvRx() {
         {/* Two-column at md (768px+), single column on mobile */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-x-6 md:items-start">
 
-          {/* LEFT: Paste */}
+          {/* LEFT: Paste + service filter */}
           <div>
-            <Paste value={raw} onChange={setRaw} onExample={handleExample} />
+            {/* Label row: paste label left, filter + example/clear right */}
+            <div className="mb-2.5 flex h-8 items-center justify-between gap-2">
+              <label htmlFor="env-paste" className="text-sm font-medium text-zinc-300">
+                Paste your{' '}
+                <code className="rounded-md bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-200 sm:text-[12px]">.env</code>{' '}
+                contents
+              </label>
+              <div className="flex items-center gap-2">
+                <ServiceFilter
+                  communityServices={communityServices}
+                  selected={selectedServices}
+                  onChange={setSelectedServices}
+                />
+                {raw ? (
+                  <>
+                    <span className="text-[11px] text-zinc-600">
+                      {raw.split('\n').filter(l => l.trim() && !l.trim().startsWith('#') && l.includes('=')).length} vars
+                    </span>
+                    <button
+                      onClick={() => setRaw('')}
+                      className="text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+                    >
+                      Clear
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleExample}
+                    className="flex items-center gap-1.5 rounded-md border border-zinc-700/60 bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-200"
+                  >
+                    Try example
+                    <span className="text-zinc-600">↗</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Textarea */}
+            <div className="group relative">
+              <div
+                className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity duration-200 group-focus-within:opacity-100"
+                style={{ boxShadow: '0 0 0 1px rgba(248,113,113,0.25), 0 0 24px rgba(248,113,113,0.06)' }}
+              />
+              <textarea
+                id="env-paste"
+                value={raw}
+                onChange={e => setRaw(e.target.value)}
+                placeholder={'OPENAI_API_KEY=sk-...\nSTRIPE_SECRET_KEY=sk_live_...\nDATABASE_URL=postgres://...'}
+                rows={10}
+                spellCheck={false}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                className="relative w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3 font-mono text-[11px] leading-relaxed text-zinc-200 placeholder:text-zinc-700 focus:border-zinc-700 focus:outline-none transition-colors sm:px-4 sm:py-3.5 sm:text-[13px]"
+              />
+              {raw && (
+                <div className="absolute bottom-2.5 right-3 text-[10px] text-zinc-700 pointer-events-none">
+                  {raw.split('\n').length} lines
+                </div>
+              )}
+            </div>
           </div>
 
           {/* RIGHT: Results */}
           <div ref={resultsRef}>
-            {/* Column header — same height as paste label row */}
-            <div className="mb-2.5 flex h-8 items-center">
-              {matches.length > 0 ? (
-                <span className="text-sm font-medium text-zinc-300">
-                  {matches.length} secret{matches.length !== 1 ? 's' : ''} detected
-                </span>
-              ) : hasContent ? (
-                <span className="text-sm font-medium text-zinc-500">No secrets found</span>
-              ) : (
-                <span className="text-sm font-medium text-zinc-700">Detected secrets</span>
+            <div className="mb-2.5 flex h-8 items-center justify-between gap-2">
+              <div>
+                {visibleMatches.length > 0 ? (
+                  <span className="text-sm font-medium text-zinc-300">
+                    {visibleMatches.length} secret{visibleMatches.length !== 1 ? 's' : ''} detected
+                    {selectedServices !== null && matches.length !== visibleMatches.length && (
+                      <span className="ml-1.5 text-[11px] text-zinc-600">
+                        ({matches.length} total)
+                      </span>
+                    )}
+                  </span>
+                ) : hasContent ? (
+                  <span className="text-sm font-medium text-zinc-500">No secrets found</span>
+                ) : (
+                  <span className="text-sm font-medium text-zinc-700">Detected secrets</span>
+                )}
+              </div>
+              {/* Clear filter hint */}
+              {selectedServices !== null && visibleMatches.length === 0 && matches.length > 0 && (
+                <button
+                  onClick={() => setSelectedServices(null)}
+                  className="text-[11px] text-zinc-600 underline underline-offset-2 hover:text-zinc-400"
+                >
+                  Show all
+                </button>
               )}
             </div>
 
-            {/* Cards:
-                mobile  — no height cap, flows naturally (page scrolls)
-                md+     — capped height with internal hidden scroll */}
             <div className="md:overflow-y-auto md:max-h-[380px] lg:max-h-[420px]">
-              {matches.length > 0 && (
+              {visibleMatches.length > 0 && (
                 <div className="flex flex-col gap-2.5 pb-1">
-                  {matches.map((match, i) => (
+                  {visibleMatches.map((match, i) => (
                     <ResultCard key={`${match.key}-${i}`} match={match} />
                   ))}
                 </div>
               )}
 
-              {hasContent && matches.length === 0 && (
+              {hasContent && visibleMatches.length === 0 && (
                 <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border border-zinc-800/60 bg-zinc-900/20 px-6 text-center">
                   <p className="text-2xl">✓</p>
                   <p className="mt-2 text-sm font-medium text-zinc-400">No recognized secrets detected</p>
