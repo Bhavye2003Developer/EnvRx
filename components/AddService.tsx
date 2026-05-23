@@ -22,6 +22,20 @@ const RISK_OPTIONS: { value: Risk; label: string; activeClass: string }[] = [
   { value: 'low',    label: 'Low',    activeClass: 'border-zinc-600 bg-zinc-800 text-zinc-300' },
 ]
 
+const RISK_DOT: Record<Risk, string> = {
+  high:   'bg-red-500',
+  medium: 'bg-orange-500',
+  low:    'bg-zinc-500',
+}
+
+const RISK_PILL: Record<Risk, string> = {
+  high:   'text-red-400 bg-red-500/10 ring-red-500/20',
+  medium: 'text-orange-400 bg-orange-500/10 ring-orange-500/20',
+  low:    'text-zinc-400 bg-zinc-700/40 ring-zinc-700/50',
+}
+
+type FilterRisk = Risk | 'all'
+
 function ServiceForm({
   onSave,
   onCancel,
@@ -146,16 +160,12 @@ function ServiceForm({
   )
 }
 
-const RISK_DOT: Record<Risk, string> = {
-  high: 'bg-red-500',
-  medium: 'bg-orange-500',
-  low: 'bg-zinc-500',
-}
-
 export default function AddService({ onServicesChange }: Props) {
   const [adding, setAdding] = useState(false)
   const [services, setServices] = useState<CommunityService[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [filterRisk, setFilterRisk] = useState<FilterRisk>('all')
 
   useEffect(() => {
     fetch('/api/community-services')
@@ -187,47 +197,106 @@ export default function AddService({ onServicesChange }: Props) {
     setAdding(false)
   }
 
+  const filtered = services.filter(s => {
+    const matchesRisk = filterRisk === 'all' || s.risk === filterRisk
+    const matchesSearch =
+      !search.trim() ||
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
+      s.key_pattern.toLowerCase().includes(search.toLowerCase())
+    return matchesRisk && matchesSearch
+  })
+
+  const hasFilters = search.trim() || filterRisk !== 'all'
+
   return (
     <section className="mt-6 rounded-xl border border-zinc-800/70 bg-zinc-900/30 px-5 py-4">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold text-zinc-200">Community Services</h2>
           <p className="mt-0.5 text-[11px] text-zinc-600">
-            {loading ? 'Loading...' : `${services.length} service${services.length !== 1 ? 's' : ''} shared by the community`}
+            {loading
+              ? 'Loading...'
+              : `${services.length} service${services.length !== 1 ? 's' : ''} shared by the community`}
           </p>
         </div>
         {!adding && (
           <button
             onClick={() => setAdding(true)}
-            className="rounded-lg border border-zinc-700/60 bg-zinc-900 px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-200"
+            className="shrink-0 rounded-lg border border-zinc-700/60 bg-zinc-900 px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-colors hover:border-zinc-600 hover:text-zinc-200"
           >
             + Add service
           </button>
         )}
       </div>
 
+      {/* Search + filter — only when there are services */}
+      {services.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[140px]">
+            <svg
+              className="pointer-events-none absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-600"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search services..."
+              className="w-full rounded-lg border border-zinc-800 bg-zinc-950 py-1.5 pl-7 pr-3 text-[11px] text-zinc-300 placeholder:text-zinc-700 focus:border-zinc-600 focus:outline-none transition-colors"
+            />
+          </div>
+
+          {/* Risk dropdown */}
+          <select
+            value={filterRisk}
+            onChange={e => setFilterRisk(e.target.value as FilterRisk)}
+            className="rounded-lg border border-zinc-800 bg-zinc-950 px-2.5 py-1.5 text-[11px] text-zinc-400 focus:border-zinc-600 focus:outline-none transition-colors cursor-pointer"
+          >
+            <option value="all">All risks</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      )}
+
+      {/* Empty states */}
       {!loading && services.length === 0 && !adding && (
         <p className="mt-3 text-[12px] text-zinc-700">
           No community services yet. Add one and it will be visible to all users - no account required.
         </p>
       )}
 
-      {services.length > 0 && (
-        <div className="mt-3 space-y-1.5">
-          {services.map(s => (
+      {services.length > 0 && filtered.length === 0 && (
+        <p className="mt-3 text-[12px] text-zinc-600">
+          No services match{hasFilters ? ' your filters' : ''}.
+        </p>
+      )}
+
+      {/* Scrollable service list */}
+      {filtered.length > 0 && (
+        <div className="mt-3 max-h-[220px] space-y-1.5 overflow-y-auto pr-0.5">
+          {filtered.map(s => (
             <div
               key={s.id}
               className="flex items-center gap-3 rounded-lg border border-zinc-800/50 bg-zinc-900/50 px-3 py-2.5"
             >
               <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${RISK_DOT[s.risk]}`} />
-              <span className="text-sm font-medium text-zinc-300 shrink-0">{s.name}</span>
-              <span className="font-mono text-[11px] text-zinc-600 truncate">{s.key_pattern}</span>
+              <span className="shrink-0 text-sm font-medium text-zinc-300">{s.name}</span>
+              <code className="min-w-0 truncate font-mono text-[11px] text-zinc-600">{s.key_pattern}</code>
+              <span className={`ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ring-inset ${RISK_PILL[s.risk]}`}>
+                {s.risk}
+              </span>
               {s.rotation_url && (
                 <a
                   href={s.rotation_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-auto shrink-0 text-[11px] text-zinc-700 transition-colors hover:text-zinc-400"
+                  className="shrink-0 text-[11px] text-zinc-700 transition-colors hover:text-zinc-400"
                 >
                   ↗
                 </a>
