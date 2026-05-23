@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'EnvRx — Leaked .env Triage',
+  title: 'EnvRx: Leaked .env Triage',
   description: 'Paste a leaked .env file. Get rotation links and git history purge commands instantly. Everything runs client-side.',
 }
 

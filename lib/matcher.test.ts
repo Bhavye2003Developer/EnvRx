@@ -35,7 +35,7 @@ describe('matchServices', () => {
     expect(result[1].service.risk).toBe('medium')
   })
 
-  it('first match wins — specific pattern beats generic fallback', () => {
+  it('first match wins: specific pattern beats generic fallback', () => {
     const entries: EnvEntry[] = [{ key: 'NEXTAUTH_SECRET', value: 'xyz', lineNumber: 1 }]
     const result = matchServices(entries)
     expect(result[0].service.name).toBe('Auth / Session Secret')

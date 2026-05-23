@@ -17,7 +17,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      className="absolute right-2 top-2 rounded-md bg-zinc-800 px-2 py-1 text-[11px] font-medium text-zinc-400 hover:bg-zinc-700 hover:text-zinc-300 transition-colors"
+      className="absolute right-2.5 top-2.5 rounded-md bg-zinc-800 px-2.5 py-1 text-[11px] font-medium text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
     >
       {copied ? '✓ Copied' : 'Copy'}
     </button>
@@ -26,8 +26,8 @@ function CopyButton({ text }: { text: string }) {
 
 function CodeBlock({ code }: { code: string }) {
   return (
-    <div className="relative mt-2">
-      <pre className="overflow-x-auto rounded-lg bg-zinc-950 px-4 py-3.5 pr-20 text-[13px] text-zinc-400 font-mono leading-relaxed border border-zinc-800/60">
+    <div className="relative mt-2.5">
+      <pre className="overflow-x-auto rounded-lg border border-zinc-800/60 bg-zinc-950 px-4 py-3.5 pr-20 font-mono text-[12px] leading-relaxed text-zinc-400">
         <code>{code}</code>
       </pre>
       <CopyButton text={code} />
@@ -52,56 +52,84 @@ echo ".env.*" >> .gitignore
 echo "!.env.example" >> .gitignore
 git add .gitignore && git commit -m "chore: add .env to gitignore"`
 
+const STEPS = [
+  {
+    number: '1',
+    label: 'Rotate first',
+    warning: true,
+    description: "Do not clean git history before rotating. If you clean first and bots already have the key, you'll have removed your audit trail.",
+  },
+  {
+    number: '2',
+    label: 'Remove from history (BFG, recommended)',
+    code: BFG_CMD,
+    env: true,
+  },
+  {
+    number: '3',
+    label: 'Alternative: git filter-repo',
+    code: FILTER_REPO_CMD,
+    env: true,
+  },
+  {
+    number: '4',
+    label: 'Add to .gitignore',
+    code: GITIGNORE_CMD,
+    env: false,
+  },
+]
+
 export default function GitCommands({ filename = '.env' }: { filename?: string }) {
   const [open, setOpen] = useState(true)
 
-  const bfg = BFG_CMD.replace(/\.env/g, filename)
-  const filterRepo = FILTER_REPO_CMD.replace(/\.env/g, filename)
-  const gitignore = GITIGNORE_CMD
-
   return (
-    <section className="mt-7 rounded-xl border border-zinc-800/80 bg-zinc-900/40">
+    <section className="mt-6 rounded-xl border border-zinc-800/70 bg-zinc-900/30 overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
         aria-controls="git-commands-body"
-        className="flex w-full items-center justify-between px-5 py-4 text-left"
+        className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-zinc-900/40"
       >
-        <h2 className="text-sm font-semibold text-zinc-300">
-          Git History Purge Commands
-        </h2>
-        <span className="text-zinc-600 text-xs">{open ? '▲' : '▼'}</span>
+        <div className="flex items-center gap-2.5">
+          <span className="text-zinc-600 text-sm">⎇</span>
+          <h2 className="text-sm font-semibold text-zinc-200">Git History Purge</h2>
+          <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-500">4 steps</span>
+        </div>
+        <span className={`text-zinc-600 text-xs transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>▼</span>
       </button>
 
       {open && (
-        <div id="git-commands-body" className="border-t border-zinc-800/60 px-5 pb-5 space-y-5">
-          {/* Step 1 — warning */}
-          <div className="mt-5 flex gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-            <span className="mt-0.5 shrink-0 text-amber-400 text-sm">⚠</span>
-            <div>
-              <p className="text-sm font-semibold text-amber-400">Rotate keys first</p>
-              <p className="mt-0.5 text-[13px] leading-relaxed text-zinc-500">
-                Do not clean git history before rotating. If you clean first and bots already have the key, you&apos;ll have removed your audit trail.
-              </p>
-            </div>
-          </div>
-
-          {/* Step 2 */}
-          <div>
-            <p className="text-[13px] font-medium text-zinc-400">Remove from history — BFG <span className="text-zinc-600 font-normal">(recommended)</span></p>
-            <CodeBlock code={bfg} />
-          </div>
-
-          {/* Step 3 */}
-          <div>
-            <p className="text-[13px] font-medium text-zinc-400">Alternative — git filter-repo</p>
-            <CodeBlock code={filterRepo} />
-          </div>
-
-          {/* Step 4 */}
-          <div>
-            <p className="text-[13px] font-medium text-zinc-400">Add to .gitignore</p>
-            <CodeBlock code={gitignore} />
+        <div id="git-commands-body" className="border-t border-zinc-800/60 px-5 pb-5">
+          <div className="mt-5 space-y-5">
+            {STEPS.map((step) => (
+              <div key={step.number} className="flex gap-3.5">
+                <div className="flex flex-col items-center">
+                  <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${
+                    step.warning
+                      ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30'
+                      : 'bg-zinc-800 text-zinc-400 ring-1 ring-zinc-700/60'
+                  }`}>
+                    {step.warning ? '!' : step.number}
+                  </div>
+                  {step.number !== '4' && <div className="mt-1.5 w-px flex-1 bg-zinc-800/80" />}
+                </div>
+                <div className="flex-1 min-w-0 pb-1">
+                  <p className={`text-[13px] font-medium ${step.warning ? 'text-amber-400' : 'text-zinc-300'}`}>
+                    {step.label}
+                  </p>
+                  {step.warning && step.description && (
+                    <p className="mt-1 text-[12px] leading-relaxed text-zinc-500">{step.description}</p>
+                  )}
+                  {step.code && (
+                    <CodeBlock
+                      code={step.env
+                        ? step.code.replace(/\.env/g, filename)
+                        : step.code}
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
