@@ -1,14 +1,24 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Paste from './Paste'
 import ResultCard from './ResultCard'
 import GitCommands from './GitCommands'
+import AddService from './AddService'
 import { parseEnv } from '@/lib/parser'
 import { matchServices } from '@/lib/matcher'
+import {
+  loadCustomServices,
+  saveCustomServices,
+  decodeShareHash,
+  toServiceDef,
+  type CustomService,
+} from '@/lib/customServices'
 
 const EXAMPLE_ENV = `# Example — paste your own .env below or try this sample
 OPENAI_API_KEY=sk-proj-abc123def456ghi789jkl012mno345pqr6
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxxxxx
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 STRIPE_SECRET_KEY=STRIPE_LIVE_KEY_REPLACE_ME
 DATABASE_URL=postgres://myuser:s3cr3t@db.prod.example.com:5432/myapp
 NEXTAUTH_SECRET=a8f5f167f44f4964e6c998dee827110c
@@ -23,20 +33,45 @@ function detectFilename(raw: string): string {
 
 export default function EnvRx() {
   const [raw, setRaw] = useState('')
+  const [customServices, setCustomServices] = useState<CustomService[]>([])
+
+  // Load from localStorage + URL hash on mount
+  useEffect(() => {
+    const fromHash = decodeShareHash(window.location.hash)
+    const fromStorage = loadCustomServices()
+
+    if (fromHash) {
+      // Merge: deduplicate by id
+      const ids = new Set(fromStorage.map(s => s.id))
+      const merged = [...fromStorage, ...fromHash.filter(s => !ids.has(s.id))]
+      setCustomServices(merged)
+      saveCustomServices(merged)
+      // Clean hash from URL without reload
+      history.replaceState(null, '', window.location.pathname)
+    } else {
+      setCustomServices(fromStorage)
+    }
+  }, [])
+
+  function handleCustomServicesChange(updated: CustomService[]) {
+    setCustomServices(updated)
+    saveCustomServices(updated)
+  }
 
   const { matches, filename } = useMemo(() => {
     if (!raw.trim()) return { matches: [], filename: '.env' }
     const entries = parseEnv(raw)
-    const matches = matchServices(entries)
+    const customDefs = customServices.map(toServiceDef)
+    const matches = matchServices(entries, customDefs)
     const filename = detectFilename(raw)
     return { matches, filename }
-  }, [raw])
+  }, [raw, customServices])
 
   const hasContent = raw.trim().length > 0
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      {/* Subtle radial glow in top-left */}
+      {/* Subtle radial glow */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
@@ -98,6 +133,9 @@ export default function EnvRx() {
 
         {/* Git commands — always shown */}
         <GitCommands filename={filename} />
+
+        {/* Custom services */}
+        <AddService services={customServices} onChange={handleCustomServicesChange} />
 
         {/* Footer */}
         <footer className="mt-12 text-center text-xs text-zinc-700">

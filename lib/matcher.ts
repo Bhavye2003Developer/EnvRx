@@ -10,13 +10,15 @@ export interface MatchedEntry {
 
 const RISK_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 }
 
-export function matchServices(entries: EnvEntry[]): MatchedEntry[] {
+export function matchServices(entries: EnvEntry[], extraServices: ServiceDef[] = []): MatchedEntry[] {
   const results: MatchedEntry[] = []
+  // Custom services checked first so user-defined patterns take priority
+  const allServices = [...extraServices, ...SERVICES]
 
   for (const entry of entries) {
     if (/^NEXT_PUBLIC_/i.test(entry.key)) continue
 
-    for (const service of SERVICES) {
+    for (const service of allServices) {
       if (service.patterns.some(p => p.test(entry.key))) {
         results.push({ service, key: entry.key, value: entry.value })
         break
