@@ -27,7 +27,7 @@ function CopyButton({ text }: { text: string }) {
 function CodeBlock({ code }: { code: string }) {
   return (
     <div className="relative mt-2.5">
-      <pre className="overflow-x-auto rounded-lg border border-zinc-800/60 bg-zinc-950 px-4 py-3.5 pr-20 font-mono text-[12px] leading-relaxed text-zinc-400">
+      <pre className="overflow-x-auto rounded-lg border border-zinc-800/60 bg-zinc-950 px-3 py-3 pr-16 font-mono text-[11px] leading-relaxed text-zinc-400 sm:px-4 sm:py-3.5 sm:pr-20 sm:text-[12px]">
         <code>{code}</code>
       </pre>
       <CopyButton text={code} />

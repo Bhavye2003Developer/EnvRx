@@ -7,17 +7,17 @@ interface PasteProps {
 }
 
 export default function Paste({ value, onChange, onExample }: PasteProps) {
-  const lineCount = value ? value.split('\n').length : 0
   const keyCount = value
     ? value.split('\n').filter(l => l.trim() && !l.trim().startsWith('#') && l.includes('=')).length
     : 0
+  const lineCount = value ? value.split('\n').length : 0
 
   return (
     <div className="w-full">
       <div className="mb-2.5 flex h-8 items-center justify-between">
         <label htmlFor="env-paste" className="text-sm font-medium text-zinc-300">
           Paste your{' '}
-          <code className="rounded-md bg-zinc-800 px-1.5 py-0.5 font-mono text-[12px] text-zinc-200">.env</code>{' '}
+          <code className="rounded-md bg-zinc-800 px-1.5 py-0.5 font-mono text-[11px] text-zinc-200 sm:text-[12px]">.env</code>{' '}
           contents
         </label>
         <div className="flex items-center gap-3">
@@ -52,16 +52,16 @@ export default function Paste({ value, onChange, onExample }: PasteProps) {
           id="env-paste"
           value={value}
           onChange={e => onChange(e.target.value)}
-          placeholder={`OPENAI_API_KEY=sk-...\nSTRIPE_SECRET_KEY=sk_live_...\nDATABASE_URL=postgres://...`}
-          rows={14}
+          placeholder={'OPENAI_API_KEY=sk-...\nSTRIPE_SECRET_KEY=sk_live_...\nDATABASE_URL=postgres://...'}
+          rows={10}
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
-          className="relative w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3.5 font-mono text-[13px] leading-relaxed text-zinc-200 placeholder:text-zinc-700 focus:border-zinc-700 focus:outline-none transition-colors"
+          className="relative w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3 font-mono text-[11px] leading-relaxed text-zinc-200 placeholder:text-zinc-700 focus:border-zinc-700 focus:outline-none transition-colors sm:px-4 sm:py-3.5 sm:text-[13px]"
         />
         {value && (
-          <div className="absolute bottom-3 right-3 text-[10px] text-zinc-700 pointer-events-none">
+          <div className="absolute bottom-2.5 right-3 text-[10px] text-zinc-700 pointer-events-none">
             {lineCount} lines
           </div>
         )}
