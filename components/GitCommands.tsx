@@ -17,9 +17,9 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
-      className="absolute right-2 top-2 rounded bg-zinc-700 px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-600 transition-colors"
+      className="absolute right-2 top-2 rounded-md bg-zinc-800 px-2 py-1 text-[11px] font-medium text-zinc-400 hover:bg-zinc-700 hover:text-zinc-300 transition-colors"
     >
-      {copied ? 'Copied!' : 'Copy'}
+      {copied ? '✓ Copied' : 'Copy'}
     </button>
   )
 }
@@ -27,7 +27,7 @@ function CopyButton({ text }: { text: string }) {
 function CodeBlock({ code }: { code: string }) {
   return (
     <div className="relative mt-2">
-      <pre className="overflow-x-auto rounded-md bg-zinc-900 p-4 pr-16 text-sm text-zinc-300 font-mono leading-relaxed">
+      <pre className="overflow-x-auto rounded-lg bg-zinc-950 px-4 py-3.5 pr-20 text-[13px] text-zinc-400 font-mono leading-relaxed border border-zinc-800/60">
         <code>{code}</code>
       </pre>
       <CopyButton text={code} />
@@ -60,44 +60,47 @@ export default function GitCommands({ filename = '.env' }: { filename?: string }
   const gitignore = GITIGNORE_CMD
 
   return (
-    <section className="mt-8 rounded-xl border border-zinc-800 bg-zinc-950">
+    <section className="mt-7 rounded-xl border border-zinc-800/80 bg-zinc-900/40">
       <button
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
         aria-controls="git-commands-body"
         className="flex w-full items-center justify-between px-5 py-4 text-left"
       >
-        <h2 className="text-base font-semibold text-zinc-100">
+        <h2 className="text-sm font-semibold text-zinc-300">
           Git History Purge Commands
         </h2>
-        <span className="text-zinc-500 text-sm">{open ? '▲ collapse' : '▼ expand'}</span>
+        <span className="text-zinc-600 text-xs">{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (
-        <div id="git-commands-body" className="border-t border-zinc-800 px-5 pb-5 space-y-6">
-          {/* Step 1 */}
-          <div className="mt-5 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-3">
-            <p className="text-sm font-semibold text-yellow-400">⚠ Step 1 — Rotate keys first</p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Do not clean git history before rotating. If you clean first and bots already have the key, you&apos;ll have removed your audit trail.
-            </p>
+        <div id="git-commands-body" className="border-t border-zinc-800/60 px-5 pb-5 space-y-5">
+          {/* Step 1 — warning */}
+          <div className="mt-5 flex gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+            <span className="mt-0.5 shrink-0 text-amber-400 text-sm">⚠</span>
+            <div>
+              <p className="text-sm font-semibold text-amber-400">Rotate keys first</p>
+              <p className="mt-0.5 text-[13px] leading-relaxed text-zinc-500">
+                Do not clean git history before rotating. If you clean first and bots already have the key, you&apos;ll have removed your audit trail.
+              </p>
+            </div>
           </div>
 
           {/* Step 2 */}
           <div>
-            <p className="text-sm font-semibold text-zinc-300">Step 2 — Remove from history (BFG, recommended)</p>
+            <p className="text-[13px] font-medium text-zinc-400">Remove from history — BFG <span className="text-zinc-600 font-normal">(recommended)</span></p>
             <CodeBlock code={bfg} />
           </div>
 
           {/* Step 3 */}
           <div>
-            <p className="text-sm font-semibold text-zinc-300">Step 3 — Alternative: git filter-repo</p>
+            <p className="text-[13px] font-medium text-zinc-400">Alternative — git filter-repo</p>
             <CodeBlock code={filterRepo} />
           </div>
 
           {/* Step 4 */}
           <div>
-            <p className="text-sm font-semibold text-zinc-300">Step 4 — Add to .gitignore</p>
+            <p className="text-[13px] font-medium text-zinc-400">Add to .gitignore</p>
             <CodeBlock code={gitignore} />
           </div>
         </div>

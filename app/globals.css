@@ -7,3 +7,12 @@
 body {
   font-family: var(--font-geist-sans), Arial, sans-serif;
 }
+
+/* Hide scrollbars globally while keeping scroll functionality */
+* {
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
