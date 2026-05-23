@@ -91,11 +91,10 @@ export default function GitCommands({ filename = '.env' }: { filename?: string }
         className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-zinc-900/40"
       >
         <div className="flex items-center gap-2.5">
-          <span className="text-zinc-600 text-sm">⎇</span>
           <h2 className="text-sm font-semibold text-zinc-200">Git History Purge</h2>
           <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-500">4 steps</span>
         </div>
-        <span className={`text-zinc-600 text-xs transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>▼</span>
+        <span className="text-zinc-600 text-xs">{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (

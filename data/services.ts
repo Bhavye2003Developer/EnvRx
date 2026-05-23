@@ -27,7 +27,7 @@ export const SERVICES: ServiceDef[] = [
     rotationUrl: 'https://console.anthropic.com/settings/keys',
     rotationLabel: 'Revoke in Anthropic Console',
     risk: 'high',
-    note: 'Claude API keys grant access to powerful models — treat like a payment credential.',
+    note: 'Claude API keys grant access to powerful models: treat like a payment credential.',
   },
   {
     name: 'Google Gemini / AI Studio',
@@ -92,7 +92,7 @@ export const SERVICES: ServiceDef[] = [
     rotationUrl: 'https://openrouter.ai/keys',
     rotationLabel: 'Revoke in OpenRouter',
     risk: 'high',
-    note: 'Grants access to 100+ models — can rack up significant spend.',
+    note: 'Grants access to 100+ models, can rack up significant spend.',
   },
   {
     name: 'ElevenLabs',
@@ -296,7 +296,7 @@ export const SERVICES: ServiceDef[] = [
     rotationUrl: 'https://www.algolia.com/account/api-keys',
     rotationLabel: 'Rotate in Algolia Dashboard',
     risk: 'medium',
-    note: 'Admin API key has full index write access — treat as high risk.',
+    note: 'Admin API key has full index write access: treat as high risk.',
   },
   // ── AI / Vector ───────────────────────────────────────────────────────────
   {
@@ -328,7 +328,7 @@ export const SERVICES: ServiceDef[] = [
     rotationLabel: 'Rotate in Notion Integrations',
     risk: 'medium',
   },
-  // Specific named secrets — MUST come before generic fallbacks
+  // Specific named secrets - MUST come before generic fallbacks
   {
     name: 'Auth / Session Secret',
     patterns: [/^NEXTAUTH_SECRET$/i, /^JWT_SECRET$/i, /^SESSION_SECRET$/i, /^APP_SECRET$/i],
@@ -345,14 +345,14 @@ export const SERVICES: ServiceDef[] = [
     risk: 'high',
     note: 'Contains connection credentials. Rotate the DB password and update all environments.',
   },
-  // Generic fallbacks — catch unknown keys that look like secrets
+  // Generic fallbacks - catch unknown keys that look like secrets
   {
     name: 'Unknown API Key',
     patterns: [/^(?!NEXT_PUBLIC_).*_API_KEY$/i],
     rotationUrl: '',
     rotationLabel: 'Find and revoke manually',
     risk: 'medium',
-    note: 'Unrecognized API key — treat it as compromised and revoke it in whatever service issued it.',
+    note: 'Unrecognized API key: treat it as compromised and revoke it in whatever service issued it.',
   },
   {
     name: 'Unknown Secret',
@@ -360,6 +360,6 @@ export const SERVICES: ServiceDef[] = [
     rotationUrl: '',
     rotationLabel: 'Find and revoke manually',
     risk: 'medium',
-    note: 'Unrecognized secret — treat it as compromised.',
+    note: 'Unrecognized secret: treat it as compromised.',
   },
 ]
