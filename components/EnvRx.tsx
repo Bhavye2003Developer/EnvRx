@@ -176,12 +176,11 @@ export default function EnvRx() {
                 value={raw}
                 onChange={e => setRaw(e.target.value)}
                 placeholder={'OPENAI_API_KEY=sk-...\nSTRIPE_SECRET_KEY=sk_live_...\nDATABASE_URL=postgres://...'}
-                rows={10}
                 spellCheck={false}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
-                className="relative w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3 font-mono text-[11px] leading-relaxed text-zinc-200 placeholder:text-zinc-700 focus:border-zinc-700 focus:outline-none transition-colors sm:px-4 sm:py-3.5 sm:text-[13px]"
+                className="relative w-full resize-none rounded-xl border border-zinc-800 bg-zinc-900/50 px-3 py-3 font-mono text-[11px] leading-relaxed text-zinc-200 placeholder:text-zinc-700 focus:border-zinc-700 focus:outline-none transition-colors sm:px-4 sm:py-3.5 sm:text-[13px] h-[260px] md:h-[380px] lg:h-[420px]"
               />
               {raw && (
                 <div className="absolute bottom-2.5 right-3 text-[10px] text-zinc-700 pointer-events-none">
@@ -221,7 +220,7 @@ export default function EnvRx() {
               )}
             </div>
 
-            <div className="md:overflow-y-auto md:max-h-[380px] lg:max-h-[420px]">
+            <div className="overflow-y-auto h-[260px] md:h-[380px] lg:h-[420px]">
               {visibleMatches.length > 0 && (
                 <div className="flex flex-col gap-2.5 pb-1">
                   {visibleMatches.map((match, i) => (
