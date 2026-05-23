@@ -231,7 +231,9 @@ export default function EnvRx() {
 
               {hasContent && visibleMatches.length === 0 && (
                 <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border border-zinc-800/60 bg-zinc-900/20 px-6 text-center">
-                  <p className="text-2xl">✓</p>
+                  <svg className="h-6 w-6 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   <p className="mt-2 text-sm font-medium text-zinc-400">No recognized secrets detected</p>
                   <p className="mt-1 text-[12px] text-zinc-600">All keys look safe or are intentionally public</p>
                 </div>

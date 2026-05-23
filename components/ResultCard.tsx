@@ -4,39 +4,6 @@ import RiskBadge from './RiskBadge'
 import type { MatchedEntry } from '@/lib/matcher'
 import type { Risk } from '@/data/services'
 
-const SERVICE_ICONS: Record<string, string> = {
-  'OpenAI': '🤖',
-  'Anthropic': '🧠',
-  'Stripe': '💳',
-  'AWS': '☁️',
-  'GitHub': '🐙',
-  'Supabase': '⚡',
-  'Google / GCP': '🔵',
-  'Firebase': '🔥',
-  'Twilio': '📱',
-  'SendGrid': '📧',
-  'Slack': '💬',
-  'Vercel': '▲',
-  'Cloudflare': '🌩️',
-  'Resend': '📨',
-  'Clerk': '🔐',
-  'Auth0': '🔒',
-  'Upstash': '🚀',
-  'HuggingFace': '🤗',
-  'Replicate': '🎨',
-  'Pinecone': '🌲',
-  'Shopify': '🛍️',
-  'Plaid': '🏦',
-  'DigitalOcean': '🌊',
-  'Notion': '📝',
-  'Mailgun': '📬',
-  'Pusher': '📡',
-  'Auth / Session Secret': '🔑',
-  'Database URL': '🗄️',
-  'Unknown API Key': '❓',
-  'Unknown Secret': '❓',
-}
-
 const accentBorder: Record<Risk, string> = {
   high:   'border-l-red-500/70',
   medium: 'border-l-orange-500/60',
@@ -49,9 +16,28 @@ const accentGlow: Record<Risk, string> = {
   low:    'group-hover:shadow-zinc-500/5',
 }
 
+const accentInitial: Record<Risk, string> = {
+  high:   'bg-red-500/10 text-red-400',
+  medium: 'bg-orange-500/10 text-orange-400',
+  low:    'bg-zinc-800 text-zinc-500',
+}
+
+function ServiceInitial({ name, risk }: { name: string; risk: Risk }) {
+  const initials = name
+    .split(/[\s/]+/)
+    .slice(0, 2)
+    .map(w => w[0]?.toUpperCase() ?? '')
+    .join('')
+
+  return (
+    <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-bold tracking-wide ${accentInitial[risk]}`}>
+      {initials}
+    </span>
+  )
+}
+
 export default function ResultCard({ match }: { match: MatchedEntry }) {
   const { service, key, value } = match
-  const icon = SERVICE_ICONS[service.name] ?? '🔑'
   const isEmpty = value === ''
 
   return (
@@ -59,7 +45,7 @@ export default function ResultCard({ match }: { match: MatchedEntry }) {
       {/* Header row */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0 sm:gap-3">
-          <span className="shrink-0 text-base leading-none sm:text-lg" aria-hidden="true">{icon}</span>
+          <ServiceInitial name={service.name} risk={service.risk} />
           <div className="min-w-0">
             <p className="font-semibold text-zinc-100 text-[13px] leading-tight sm:text-sm">{service.name}</p>
             <code className="mt-0.5 block font-mono text-[10px] text-zinc-500 truncate sm:text-[11px]" title={key}>{key}</code>

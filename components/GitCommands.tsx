@@ -19,7 +19,7 @@ function CopyButton({ text }: { text: string }) {
       onClick={copy}
       className="absolute right-2.5 top-2.5 rounded-md bg-zinc-800 px-2.5 py-1 text-[11px] font-medium text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
     >
-      {copied ? '✓ Copied' : 'Copy'}
+      {copied ? 'Copied' : 'Copy'}
     </button>
   )
 }
@@ -94,7 +94,9 @@ export default function GitCommands({ filename = '.env' }: { filename?: string }
           <h2 className="text-sm font-semibold text-zinc-200">Git History Purge</h2>
           <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-500">4 steps</span>
         </div>
-        <span className="text-zinc-600 text-xs">{open ? '▲' : '▼'}</span>
+        <svg className={`h-3.5 w-3.5 text-zinc-600 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
       </button>
 
       {open && (
