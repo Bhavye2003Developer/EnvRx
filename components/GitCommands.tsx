@@ -57,7 +57,7 @@ export default function GitCommands({ filename = '.env' }: { filename?: string }
 
   const bfg = BFG_CMD.replace(/\.env/g, filename)
   const filterRepo = FILTER_REPO_CMD.replace(/\.env/g, filename)
-  const gitignore = GITIGNORE_CMD.replace(/\.env/g, filename)
+  const gitignore = GITIGNORE_CMD
 
   return (
     <section className="mt-8 rounded-xl border border-zinc-800 bg-zinc-950">

@@ -54,7 +54,7 @@ export const SERVICES: ServiceDef[] = [
   },
   {
     name: 'Supabase',
-    patterns: [/^SUPABASE_SERVICE_ROLE_KEY$/i, /^SUPABASE_ANON_KEY$/i, /^NEXT_PUBLIC_SUPABASE_ANON_KEY$/i],
+    patterns: [/^SUPABASE_SERVICE_ROLE_KEY$/i, /^SUPABASE_ANON_KEY$/i],
     rotationUrl: 'https://supabase.com/dashboard/project/_/settings/api',
     rotationLabel: 'Reset in Supabase Project Settings',
     risk: 'high',
