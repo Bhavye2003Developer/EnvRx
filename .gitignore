@@ -28,6 +28,7 @@
 # local tooling
 .claude
 docs
+.playwright-mcp
 
 # debug
 npm-debug.log*
