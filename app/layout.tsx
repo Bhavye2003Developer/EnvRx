@@ -24,6 +24,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <style>{`
+          *,html,body{scrollbar-width:none!important;-ms-overflow-style:none!important}
+          *::-webkit-scrollbar,html::-webkit-scrollbar,body::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+        `}</style>
+      </head>
       <body className="min-h-full bg-zinc-950">{children}</body>
     </html>
   )
